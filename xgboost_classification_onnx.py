@@ -25,7 +25,6 @@ def main(logger, data_path, model_path):
             engine="pyarrow",
             columns=["rev_text", "filtered_text", "overall"],
         ).compute()
-        logger.log("Failed to read data")
     except:
         logger.log(traceback.format_exc())
         review_df_full = ddf.read_parquet(
@@ -92,6 +91,7 @@ def main(logger, data_path, model_path):
         with fsspec.open(os.path.join(model_path, "xgboost.onnx"), mode="wb") as f:
             f.write(model_onnx.SerializeToString())
     except:
+        logger.log(traceback.format_exc())
         with fsspec.open(
             os.path.join(model_path, "xgboost.onnx"),
             mode="wb",
