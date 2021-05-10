@@ -79,10 +79,12 @@ def main(logger, data_path, model_path):
         convert_xgboost,
         options={"nocl": [True, False], "zipmap": [True, False]},
     )
-
-    model_onnx = convert_sklearn(
-        xgb_pipeline, "xgboost", [("input", StringTensorType())], target_opset=12
-    )
+    try:
+        model_onnx = convert_sklearn(
+            xgb_pipeline, "xgboost", [("input", StringTensorType())], target_opset=12
+        )
+    except:
+        logger.log(traceback.format_exc())
 
     logger.log("finished converting to onnx")
 
