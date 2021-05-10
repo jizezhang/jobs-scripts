@@ -39,9 +39,7 @@ def main(logger, data_path, model_path):
     review_df = review_df_full.sample(frac=0.2)
     logger.log("finished loading data")
 
-    tf_vectorizer = TfidfVectorizer(
-        ngram_range=(1, 3), lowercase=False, max_features=20000
-    )
+    tf_vectorizer = TfidfVectorizer(lowercase=False, max_features=20000)
     tf_vectorizer.fit(review_df["rev_text"])
     logger.log("finished fitting vectorizer")
 
