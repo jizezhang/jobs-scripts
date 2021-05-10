@@ -14,6 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
+import traceback
 
 
 def main(logger, data_path, model_path):
@@ -24,7 +25,9 @@ def main(logger, data_path, model_path):
             engine="pyarrow",
             columns=["rev_text", "filtered_text", "overall"],
         ).compute()
+        logger.log("Failed to read data")
     except:
+        logger.log(traceback.format_exc())
         review_df_full = ddf.read_parquet(
             data_path,
             engine="pyarrow",
