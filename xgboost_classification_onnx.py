@@ -86,18 +86,18 @@ def main(logger, data_path, model_path):
     logger.log("finished converting to onnx")
 
     try:
-        with fsspec.open(os.path.join(model_path, "xgboost.onnx"), mode="wb") as f:
+        with fsspec.open(model_path, mode="wb") as f:
             f.write(model_onnx.SerializeToString())
     except:
         logger.log(traceback.format_exc())
         with fsspec.open(
-            os.path.join(model_path, "xgboost.onnx"),
+            model_path,
             mode="wb",
             config=oci.config.from_file(os.path.join("~/.oci", "config")),
         ) as f:
             f.write(model_onnx.SerializeToString())
 
-    logger.log(f"model saved to {os.path.join(model_path, 'xgboost.onnx')}")
+    logger.log(f"model saved to {model_path}")
 
     with fsspec.open("xgboost_local.onnx", mode="wb") as f:
         f.write(model_onnx.SerializeToString())
