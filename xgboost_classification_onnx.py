@@ -20,7 +20,7 @@ from xgboost import XGBClassifier
 import traceback
 
 
-def main(logger, data_path, model_path):
+def main(logger, data_path, model_path=os.environ['OUTPUT_DIR']):
     logger.log(f"data from {data_path}")
     try:
         review_df_full = ddf.read_parquet(
