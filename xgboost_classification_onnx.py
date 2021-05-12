@@ -109,6 +109,9 @@ def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
     shutil.copy2(
         os.path.join(curr_dir, "score.py"), os.path.join(model_path, "score.py")
     )
+    shutil.copy2(
+        os.path.join(curr_dir, "runtime.yaml"), os.path.join(model_path, "runtime.yaml")
+    )
 
     with fsspec.open(os.path.join(model_path, "model.onnx"), mode="wb") as f:
         f.write(model_onnx.SerializeToString())
