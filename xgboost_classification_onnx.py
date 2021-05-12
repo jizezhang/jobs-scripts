@@ -1,5 +1,8 @@
 import argparse
 import os
+import shutil
+import pathlib
+import importlib
 
 import ads
 import fsspec
@@ -85,33 +88,47 @@ def main(logger, data_path, model_path):
 
     logger.log("finished converting to onnx")
 
-    try:
-        with fsspec.open(model_path, mode="wb") as f:
-            f.write(model_onnx.SerializeToString())
-    except:
-        logger.log(traceback.format_exc())
-        with fsspec.open(
-            model_path,
-            mode="wb",
-            config=oci.config.from_file(os.path.join("~/.oci", "config")),
-        ) as f:
-            f.write(model_onnx.SerializeToString())
+    # try:
+    #     with fsspec.open(model_path, mode="wb") as f:
+    #         f.write(model_onnx.SerializeToString())
+    # except:
+    #     logger.log(traceback.format_exc())
+    #     with fsspec.open(
+    #         model_path,
+    #         mode="wb",
+    #         config=oci.config.from_file(os.path.join("~/.oci", "config")),
+    #     ) as f:
+    #         f.write(model_onnx.SerializeToString())
+    #
+    # logger.log(f"model saved to {model_path}")
 
-    logger.log(f"model saved to {model_path}")
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    pathlib.Path(model_path).mkdir(exist_ok=True, parents=True)
+    shutil.copy2(os.path.join(curr_dir, "score.py"), os.path.join(model_path, "score.py"))
 
-    with fsspec.open("xgboost_local.onnx", mode="wb") as f:
+    with fsspec.open(os.path.join(model_path, "model.onnx"), mode="wb") as f:
         f.write(model_onnx.SerializeToString())
 
-    sess = rt.InferenceSession("xgboost_local.onnx")
-    pred_onx = sess.run(None, {"input": testx_orig[:5].values})
-    logger.log(f"predict {pred_onx[0]}")
-    logger.log(f"predict_proba {pred_onx[1][:1]}")
+    spec = importlib.util.spec_from_file_location("score", os.path.join(model_path, 'score.py'))
+    score = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(score)
+    score.load_model()
+
+    logger.log(score.predict(data_path))
+
+
+    # sess = rt.InferenceSession(os.path.join(model_path, "model.onnx"))
+    # pred_onx = sess.run(None, {"input": testx_orig[:5].values})
+    # logger.log(f"predict {pred_onx[0]}")
+    # logger.log(f"predict_proba {pred_onx[1][:1]}")
 
 
 if __name__ == "__main__":
+    if 'OUTPUT_DIR' not in os.environ:
+        os.environ['OUTPUT_DIR'] = './output'
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-path")
-    parser.add_argument("--model-path")
+    parser.add_argument("--model-path", default=os.environ['OUTPUT_DIR'])
     args = parser.parse_args()
 
     import logging
