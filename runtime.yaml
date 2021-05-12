@@ -1,0 +1,23 @@
+# Model runtime environment
+MODEL_ARTIFACT_VERSION: '3.0'
+MODEL_DEPLOYMENT:
+  INFERENCE_CONDA_ENV:
+    INFERENCE_ENV_PATH: oci://service-conda-packs@id19sfcrra6z/service_pack/cpu/General
+      Machine Learning for CPUs/1.0/mlcpuv1
+    INFERENCE_ENV_SLUG: mlcpuv1
+    INFERENCE_ENV_TYPE: data_science
+    INFERENCE_PYTHON_VERSION: 3.6.11
+MODEL_PROVENANCE:
+  PROJECT_OCID: ocid1.datascienceproject.oc1.iad.amaaaaaav66vvniaz3oswgnkq3ahb7dbzg4grzqtip7eqnfilne6crb6mq4a
+  TENANCY_OCID: ocid1.tenancy.oc1..aaaaaaaahzy3x4boh7ipxyft2rowu2xeglvanlfewudbnueugsieyuojkldq
+  TRAINING_COMPARTMENT_OCID: ocid1.tenancy.oc1..aaaaaaaahzy3x4boh7ipxyft2rowu2xeglvanlfewudbnueugsieyuojkldq
+  TRAINING_CONDA_ENV:
+    TRAINING_ENV_PATH: oci://service-conda-packs@id19sfcrra6z/service_pack/cpu/General
+      Machine Learning for CPUs/1.0/mlcpuv1
+    TRAINING_ENV_SLUG: mlcpuv1
+    TRAINING_ENV_TYPE: data_science
+    TRAINING_PYTHON_VERSION: 3.6.11
+  TRAINING_REGION: us-ashburn-1
+  TRAINING_RESOURCE_OCID: ocid1.datasciencenotebooksession.oc1.iad.amaaaaaav66vvniacthrkqjvqaju6yrfly5wbuegtnonkpocp266rkswerja
+  USER_OCID: ocid1.user.oc1..aaaaaaaayz3vzuof5c2i2kybadttratc6pex4ylvzg5wltv2vflyrpk2ko2a
+  VM_IMAGE_INTERNAL_ID: NB495-DC191-VMP36-VMA233-JL1.2.3
