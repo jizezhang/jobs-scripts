@@ -1,13 +1,13 @@
 import argparse
-import os
-import shutil
-import pathlib
 import importlib
+import os
+import pathlib
+import shutil
+import traceback
 
 import ads
 import fsspec
 import oci
-import onnxruntime as rt
 from dask import dataframe as ddf
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from skl2onnx import convert_sklearn, update_registered_converter
@@ -17,10 +17,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
-import traceback
+
+if "OUTPUT_DIR" not in os.environ:
+    os.environ["OUTPUT_DIR"] = "./output"
 
 
-def main(logger, data_path, model_path=os.environ['OUTPUT_DIR']):
+def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
     logger.log(f"data from {data_path}")
     try:
         review_df_full = ddf.read_parquet(
@@ -104,18 +106,21 @@ def main(logger, data_path, model_path=os.environ['OUTPUT_DIR']):
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     pathlib.Path(model_path).mkdir(exist_ok=True, parents=True)
-    shutil.copy2(os.path.join(curr_dir, "score.py"), os.path.join(model_path, "score.py"))
+    shutil.copy2(
+        os.path.join(curr_dir, "score.py"), os.path.join(model_path, "score.py")
+    )
 
     with fsspec.open(os.path.join(model_path, "model.onnx"), mode="wb") as f:
         f.write(model_onnx.SerializeToString())
 
-    spec = importlib.util.spec_from_file_location("score", os.path.join(model_path, 'score.py'))
+    spec = importlib.util.spec_from_file_location(
+        "score", os.path.join(model_path, "score.py")
+    )
     score = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(score)
     score.load_model()
 
     logger.log(score.predict(data_path))
-
 
     # sess = rt.InferenceSession(os.path.join(model_path, "model.onnx"))
     # pred_onx = sess.run(None, {"input": testx_orig[:5].values})
@@ -124,11 +129,9 @@ def main(logger, data_path, model_path=os.environ['OUTPUT_DIR']):
 
 
 if __name__ == "__main__":
-    if 'OUTPUT_DIR' not in os.environ:
-        os.environ['OUTPUT_DIR'] = './output'
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-path")
-    parser.add_argument("--model-path", default=os.environ['OUTPUT_DIR'])
+    parser.add_argument("--model-path", default=os.environ["OUTPUT_DIR"])
     args = parser.parse_args()
 
     import logging
