@@ -133,7 +133,7 @@ def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-path")
+    parser.add_argument("--data-path", default="oci://jize-dev@ociodscdev/jobs/etl-out/*.parquet")
     parser.add_argument("--model-path", default=os.environ["OUTPUT_DIR"])
     args = parser.parse_args()
 
