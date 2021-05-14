@@ -76,7 +76,7 @@ def predict(data, model=load_model()):
     input_data = {'input': X}
     pred = model.run(None, input_data)[0]
 
-    return {'prediction': pred.tolist()[:100]}
+    return {'prediction': pred[:100].tolist()}
 
 
 # class ONNXTransformer(object):
