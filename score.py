@@ -74,6 +74,10 @@ def predict(data, model=load_model()):
         X = df.values
 
     input_data = {'input': X}
-    pred = model.run(None, input_data)[0]
+    df['pred'] = model.run(None, input_data)[0].tolist()
+    print(df.head())
+    output_path = 'oci://mayoor-dev/jobs-demo/deploy/pred.csv'
+    df.to_csv(output_path)
+    print("finished writing to object storage")
 
-    return {'prediction': pred.tolist()}
+    return {'output_path': output_path}
