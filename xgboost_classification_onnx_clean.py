@@ -5,6 +5,7 @@ import pathlib
 import shutil
 import traceback
 
+import ads
 from dask import dataframe as ddf
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from skl2onnx import convert_sklearn, update_registered_converter
