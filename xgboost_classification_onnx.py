@@ -113,8 +113,7 @@ def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
     score = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(score)
     score.load_model()
-    score.predict(data_path)
-    # logger.log(score.predict(data_path))
+    logger.log(score.predict(data_path))
 
 
 if __name__ == "__main__":
