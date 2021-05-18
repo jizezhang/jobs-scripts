@@ -59,8 +59,7 @@ def predict(data, model=load_model()):
             data,
             engine='pyarrow',
             columns=['rev_text'],
-        ).compute()[:5]
-        X = df.values
+        ).compute()
     except:
         print(traceback.format_exc())
         df = ddf.read_parquet(
@@ -70,14 +69,27 @@ def predict(data, model=load_model()):
             storage_options={
                 "config": oci.config.from_file(os.path.join("~/.oci", "config"))
             },
-        ).compute()[:5]
-        X = df.values
-
+        ).compute()
+    df = df[:40000]
+    X = df.values
+    print("shapes")
+    print(X.shape)
+    print(df.shape)
     input_data = {'input': X}
+    pred = model.run(None, input_data)[0]
+    print(len(pred))
     df['pred'] = model.run(None, input_data)[0].tolist()
     print(df.head())
-    output_path = 'oci://mayoor-dev/jobs-demo/deploy/pred.csv'
-    df.to_csv(output_path)
+    dask_df = ddf.from_pandas(df, npartitions=1)
+    try:
+        dask_df.to_csv('oci://mayoor-dev/jobs-demo/deploy/pred.csv')
+    except:
+        dask_df.to_csv(
+            'oci://mayoor-dev@ociodscdev/jobs-demo/deploy/pred.csv',
+            storage_options={
+                "config": oci.config.from_file(os.path.join("~/.oci", "config"))
+            }
+        )
     print("finished writing to object storage")
 
-    return {'output_path': output_path}
+    return {'output_path': 'oci://mayoor-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
