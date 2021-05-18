@@ -80,9 +80,9 @@ def main(logger, data_path):
 
     model = xgboost.train({"objective": "multi:softmax", "num_class": 6}, d_train)
     model.save_model('model')
-    for _ in range(int(os.environ['N_ROUNDS'])):
+    for i in range(int(os.environ['N_ROUNDS'])):
         model = xgboost.train({"objective": "multi:softmax", "num_class": 6}, d_train, xgb_model='model')
-        logger.log(f"==== accuracy: {accuracy_score(testy, model.predict(d_val))} ==== ")
+        logger.log(f"==== iteration: {i} accuracy: {accuracy_score(testy, model.predict(d_val))} ==== ")
         model.save_model('model')
 
     logger.log("finished training model")
