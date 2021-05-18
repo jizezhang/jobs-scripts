@@ -1,17 +1,11 @@
 import os
-import json
-
-import cloudpickle
-import numpy as np
-import onnxruntime as rt
+import traceback
+import uuid
 
 import ads
-from sklearn.preprocessing import LabelEncoder
-from dask import dataframe as ddf
-import pandas as pd
-import traceback
 import oci
-
+import onnxruntime as rt
+from dask import dataframe as ddf
 
 model_name = 'model.onnx'
 transformer_name = 'onnx_data_transformer.json'
@@ -80,12 +74,13 @@ def predict(data, model=load_model()):
     print(len(pred))
     df['pred'] = model.run(None, input_data)[0].tolist()
     dask_df = ddf.from_pandas(df, npartitions=1)
+    uid = str(uuid.uuid4())
     try:
-        dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
+        dask_df.to_csv(f'oci://jize-dev/jobs-demo/deploy/pred-{uid}.csv', single_file=True)
     except:
         print(traceback.format_exc())
         dask_df.to_csv(
-            'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv',
+            f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv',
             single_file=True,
             storage_options={
                 "config": oci.config.from_file(os.path.join("~/.oci", "config"))
@@ -93,4 +88,4 @@ def predict(data, model=load_model()):
         )
     print("finished writing to object storage")
 
-    return {'output_path': 'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
+    return {'output_path': f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv'}
