@@ -82,10 +82,10 @@ def predict(data, model=load_model()):
     print(df.head())
     dask_df = ddf.from_pandas(df, npartitions=1)
     try:
-        dask_df.to_csv('oci://mayoor-dev/jobs-demo/deploy/pred.csv', single_file=True)
+        dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
     except:
         dask_df.to_csv(
-            'oci://mayoor-dev@ociodscdev/jobs-demo/deploy/pred.csv',
+            'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv',
             single_file=True,
             storage_options={
                 "config": oci.config.from_file(os.path.join("~/.oci", "config"))
@@ -93,4 +93,4 @@ def predict(data, model=load_model()):
         )
     print("finished writing to object storage")
 
-    return {'output_path': 'oci://mayoor-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
+    return {'output_path': 'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
