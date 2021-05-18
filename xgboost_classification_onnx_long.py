@@ -8,12 +8,13 @@ import xgboost
 from dask import dataframe as ddf
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 if "OUTPUT_DIR" not in os.environ:
     os.environ["OUTPUT_DIR"] = "./output"
 
 if "N_ROUNDS" not in os.environ:
-    os.environ["N_ROUNDS"] = "10000"
+    os.environ["N_ROUNDS"] = "10"
 
 
 def main(logger, data_path):
@@ -47,21 +48,21 @@ def main(logger, data_path):
     )
     logger.log("finished train test split")
 
-    class Callback(xgboost.callback.TrainingCallback):
-        def __init__(self, logger):
-            self.logger = logger
-
-        def _get_key(self, data, metric):
-            return f"{data}-{metric}"
-
-        def after_iteration(self, model, epoch, evals_log):
-            print("called")
-            for data, metric in evals_log.items():
-                for metric_name, log in metric.items():
-                    key = self._get_key(data, metric_name)
-                    self.logger.log(f"{key}: {log}")
-            self.logger.log(f"epoch {epoch}")
-            return False
+    # class Callback(xgboost.callback.TrainingCallback):
+    #     def __init__(self, logger):
+    #         self.logger = logger
+    #
+    #     def _get_key(self, data, metric):
+    #         return f"{data}-{metric}"
+    #
+    #     def after_iteration(self, model, epoch, evals_log):
+    #         print("called")
+    #         for data, metric in evals_log.items():
+    #             for metric_name, log in metric.items():
+    #                 key = self._get_key(data, metric_name)
+    #                 self.logger.log(f"{key}: {log}")
+    #         self.logger.log(f"epoch {epoch}")
+    #         return False
 
     trainx = tf_vectorizer.transform(trainx_orig["rev_text"])
     testx = tf_vectorizer.transform(testx_orig["rev_text"])
@@ -69,13 +70,20 @@ def main(logger, data_path):
     logger.log(f'xgboost version {xgboost.__version__}')
     d_train = xgboost.DMatrix(trainx, trainy)
     d_val = xgboost.DMatrix(testx, testy)
-    xgboost.train(
-        {"objective": "multi:softmax", "num_class": 6},
-        d_train,
-        num_boost_round=int(os.environ['N_ROUNDS']),
-        evals=[(d_train, "Train"), (d_val, "Valid")],
-        callbacks=[Callback(logger)],
-    )
+    # xgboost.train(
+    #     {"objective": "multi:softmax", "num_class": 6},
+    #     d_train,
+    #     num_boost_round=int(os.environ['N_ROUNDS']),
+    #     evals=[(d_train, "Train"), (d_val, "Valid")],
+    #     callbacks=[Callback(logger)],
+    # )
+
+    model = xgboost.train({"objective": "multi:softmax", "num_class": 6}, d_train)
+    model.save_model('model')
+    for _ in range(int(os.environ['N_ROUNDS'])):
+        model = xgboost.train({"objective": "multi:softmax", "num_class": 6}, d_train, xgb_model='model')
+        logger.log(f"==== accuracy: {accuracy_score(testy, model.predict(d_val))} ==== ")
+        model.save_model('model')
 
     logger.log("finished training model")
 
