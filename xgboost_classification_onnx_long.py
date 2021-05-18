@@ -65,6 +65,8 @@ def main(logger, data_path):
 
     trainx = tf_vectorizer.transform(trainx_orig["rev_text"])
     testx = tf_vectorizer.transform(testx_orig["rev_text"])
+
+    logger.log(f'xgboost version {xgboost.__version__}')
     d_train = xgboost.DMatrix(trainx, trainy)
     d_val = xgboost.DMatrix(testx, testy)
     xgboost.train(

@@ -79,11 +79,11 @@ def predict(data, model=load_model()):
     pred = model.run(None, input_data)[0]
     print(len(pred))
     df['pred'] = model.run(None, input_data)[0].tolist()
-    print(df.head())
     dask_df = ddf.from_pandas(df, npartitions=1)
     try:
         dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
     except:
+        print(traceback.format_exc())
         dask_df.to_csv(
             'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv',
             single_file=True,
