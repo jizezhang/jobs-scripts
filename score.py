@@ -70,7 +70,7 @@ def predict(data, model=load_model()):
                 "config": oci.config.from_file(os.path.join("~/.oci", "config"))
             },
         ).compute()
-    df = df[:40000]
+    df = df[:1000]
     X = df.values
     print("shapes")
     print(X.shape)
@@ -82,10 +82,11 @@ def predict(data, model=load_model()):
     print(df.head())
     dask_df = ddf.from_pandas(df, npartitions=1)
     try:
-        dask_df.to_csv('oci://mayoor-dev/jobs-demo/deploy/pred.csv')
+        dask_df.to_csv('oci://mayoor-dev/jobs-demo/deploy/pred.csv', single_file=True)
     except:
         dask_df.to_csv(
             'oci://mayoor-dev@ociodscdev/jobs-demo/deploy/pred.csv',
+            single_file=True,
             storage_options={
                 "config": oci.config.from_file(os.path.join("~/.oci", "config"))
             }
