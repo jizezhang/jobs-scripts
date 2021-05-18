@@ -101,23 +101,3 @@ def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
     spec.loader.exec_module(score)
     score.load_model()
     logger.log(score.predict(data_path))
-
-#
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("--data-path", default="oci://jize-dev@ociodscdev/jobs/etl-out/*.parquet")
-#     parser.add_argument("--model-path", default=os.environ["OUTPUT_DIR"])
-#     args = parser.parse_args()
-#
-#     import logging
-#
-#     logging.basicConfig(level=logging.INFO)
-#
-#     class Logger:
-#         def __init__(self):
-#             self.logger = logging.getLogger(__name__)
-#
-#         def log(self, msg):
-#             self.logger.info(msg)
-#
-#     main(Logger(), args.data_path, args.model_path)
