@@ -75,17 +75,17 @@ def predict(data, model=load_model()):
     df['pred'] = model.run(None, input_data)[0].tolist()
     dask_df = ddf.from_pandas(df, npartitions=1)
     uid = str(uuid.uuid4())
-    try:
-        dask_df.to_csv(f'oci://jize-dev/jobs-demo/deploy/pred-{uid}.csv', single_file=True)
-    except:
-        print(traceback.format_exc())
-        dask_df.to_csv(
-            f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv',
-            single_file=True,
-            storage_options={
-                "config": oci.config.from_file(os.path.join("~/.oci", "config"))
-            }
-        )
+    # try:
+    dask_df.to_csv(f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv', single_file=True)
+    # except:
+    #     print(traceback.format_exc())
+    #     dask_df.to_csv(
+    #         f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv',
+    #         single_file=True,
+    #         storage_options={
+    #             "config": oci.config.from_file(os.path.join("~/.oci", "config"))
+    #         }
+    #     )
     print("finished writing to object storage")
 
     return {'output_path': f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv'}
