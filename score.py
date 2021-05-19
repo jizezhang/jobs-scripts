@@ -54,7 +54,8 @@ def predict(data, model=load_model()):
         X = df.values
         input_data = {'input': X}
         pred = model.run(None, input_data)[0]
-        sample = pred[:5]
+        sample = pred[:5].tolist()
+        print(type(sample))
         print(len(pred))
         df = df[:len(pred)]
         print(df.shape)
