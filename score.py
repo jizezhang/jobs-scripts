@@ -48,15 +48,21 @@ def predict(data, model=load_model()):
 
     """
     print('data path', data)
-    df = ddf.read_parquet(data, engine='pyarrow', columns=['rev_text']).compute()
-    df = df[:1000]
-    X = df.values
-    input_data = {'input': X}
-    pred = model.run(None, input_data)[0]
-    df = df[:len(pred)]
-    df['pred'] = pred
-    dask_df = ddf.from_pandas(df, npartitions=1)
-    dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
-    print("finished writing to object storage")
+    try:
+        df = ddf.read_parquet(data, engine='pyarrow', columns=['rev_text']).compute()
+        df = df[:1000]
+        X = df.values
+        input_data = {'input': X}
+        pred = model.run(None, input_data)[0]
+        sample = pred[:5]
+        print(len(pred))
+        df = df[:len(pred)]
+        print(df.shape)
+        df['pred'] = pred
+        dask_df = ddf.from_pandas(df, npartitions=1)
+        dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
+        print("finished writing to object storage")
+    except:
+        traceback.print_exc()
 
-    return {'output_path': 'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
+    return {'sample': sample, 'output_path': 'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
