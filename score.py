@@ -48,45 +48,15 @@ def predict(data, model=load_model()):
 
     """
     print('data path', data)
-    # try:
-    df = ddf.read_parquet(
-        data,
-        engine='pyarrow',
-        columns=['rev_text'],
-    ).compute()
-    # except:
-    #     print(traceback.format_exc())
-    #     df = ddf.read_parquet(
-    #         data,
-    #         engine='pyarrow',
-    #         columns=['rev_text'],
-    #         storage_options={
-    #             "config": oci.config.from_file(os.path.join("~/.oci", "config"))
-    #         },
-    #     ).compute()
+    df = ddf.read_parquet(data, engine='pyarrow', columns=['rev_text']).compute()
     df = df[:1000]
     X = df.values
-    print("shapes")
-    print(X.shape)
-    print(df.shape)
     input_data = {'input': X}
     pred = model.run(None, input_data)[0]
-    print(len(pred))
     df = df[:len(pred)]
-    print(df.shape)
     df['pred'] = pred
     dask_df = ddf.from_pandas(df, npartitions=1)
-    # try:
     dask_df.to_csv('oci://jize-dev/jobs-demo/deploy/pred.csv', single_file=True)
-    # except:
-    #     print(traceback.format_exc())
-    #     dask_df.to_csv(
-    #         f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv',
-    #         single_file=True,
-    #         storage_options={
-    #             "config": oci.config.from_file(os.path.join("~/.oci", "config"))
-    #         }
-    #     )
     print("finished writing to object storage")
 
     return {'output_path': 'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred.csv'}
