@@ -72,7 +72,8 @@ def predict(data, model=load_model()):
     input_data = {'input': X}
     pred = model.run(None, input_data)[0]
     print(len(pred))
-    df['pred'] = model.run(None, input_data)[0].tolist()
+    df = df[:len(pred)]
+    df['pred'] = pred
     dask_df = ddf.from_pandas(df, npartitions=1)
     uid = str(uuid.uuid4())
     # try:
