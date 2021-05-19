@@ -66,7 +66,7 @@ def main(logger, data_path, model_path=os.environ["OUTPUT_DIR"]):
         "normalize_type": "tree",
         "rate_drop": 0.0037771727376729345,
         "skip_drop": 5.207598767315119e-06,
-        "n_estimators": 1,
+        "n_estimators": 10,
         "seed": 42,
     }
     xgb_model = XGBClassifier(**params)
