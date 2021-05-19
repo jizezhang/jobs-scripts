@@ -76,7 +76,7 @@ def predict(data, model=load_model()):
     dask_df = ddf.from_pandas(df, npartitions=1)
     uid = str(uuid.uuid4())
     # try:
-    dask_df.to_csv(f'oci://jize-dev@ociodscdev/jobs-demo/deploy/pred-{uid}.csv', single_file=True)
+    dask_df.to_csv(f'oci://jize-dev/jobs-demo/deploy/pred-{uid}.csv', single_file=True)
     # except:
     #     print(traceback.format_exc())
     #     dask_df.to_csv(
